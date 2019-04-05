@@ -1,0 +1,104 @@
+# Default values for springboot-helm-example.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+image:
+  repository: vjda/springboot-helm-example
+  tag: openjdk-8-jre-alpine
+  pullPolicy: IfNotPresent
+service:
+  type: LoadBalancer
+  externalPort: 8080
+  internalPort: 8080
+  annotations:
+    fabric8.io/expose: "true"
+    fabric8.io/ingress.annotations: "kubernetes.io/ingress.class: nginx"
+ingress:
+  enabled: false
+  # Used to create an Ingress record.
+  # hosts:
+  #   - chart-example.local
+  # annotations:
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: "true"
+  # tls:
+  #   # Secrets must be manually created in the namespace.
+  #   - secretName: chart-example-tls
+  #     hosts:
+  #       - chart-example.local
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+probePath: /actuator/health
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 3
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 3
+terminationGracePeriodSeconds: 10
+secrets:
+  redis:
+    name: redis-secret
+    data:
+      connection-url: "redis://:myRedisPass@mychart-redis-master:6379"
+  mongodb:
+    name: mongodb-secret
+    data:
+      connection-url: "mongodb://mongouser:myM0ng0Pass@mychart-mongodb:27017/my-database"
+extraEnv: |
+  - name: JAVA_PARAMETERS
+    value: --spring.config.location=file:///opt/deployments/config/application.yml
+  - name: REDIS_CONNECTION_URL
+    valueFrom:
+      secretKeyRef:
+        name: redis-secret
+        key: connection-url
+  - name: MONGODB_CONNECTION_URL
+    valueFrom:
+      secretKeyRef:
+        name: mongodb-secret
+        key: connection-url
+extraVolumeMounts: |
+  - name: spring-app-config
+    mountPath: /opt/deployments/config
+    readOnly: true
+extraVolumes: |
+  - name: spring-app-config
+    configMap:
+      name: config
+      items:
+      - key: application.yml
+        path: application.yml
+
+
+# Override default values for redis and mongo charts
+redis:
+  cluster:
+    enabled: false
+  usePassword: true
+  password: myRedisPass
+  master:
+    service:
+      type: LoadBalancer
+      port: 6379
+mongodb:
+  service:
+    type: LoadBalancer
+  mongodbRootPassword: myR00tSup3rPass
+  mongodbUsername: mongouser
+  mongodbPassword: myM0ng0Pass
+  mongodbDatabase: my-database
+  port: 27017

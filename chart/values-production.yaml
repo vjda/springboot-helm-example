@@ -1,0 +1,32 @@
+# Pro values for springboot-helm-example.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 3
+secrets:
+  redis:
+    data:
+      connection-url: "redis://:wAzgwaoXF3ZM9xJjNQ7f@poc-redis-master:8548"
+  mongodb:
+    data:
+      connection-url: "mongodb://prod:43jsh547jJ@poc-mongodb:27018/dbpro"
+
+
+
+# Override default values for redis and mongo charts
+redis:
+  cluster:
+    enabled: true
+  usePassword: true
+  password: wAzgwaoXF3ZM9xJjNQ7f
+  master:
+    service:
+      type: ClusterIP
+      port: 8548
+mongodb:
+  service:
+    type: ClusterIP
+  mongodbRootPassword: aD34WLCf42LkGy596k6c
+  mongodbUsername: prod
+  mongodbPassword: 43jsh547jJ
+  mongodbDatabase: dbpro
+  port: 27018

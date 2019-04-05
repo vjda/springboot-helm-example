@@ -1,0 +1,9 @@
+dependencies:
+  - name: redis
+    version: 6.4.3
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    alias: redis
+  - name: mongodb
+    version: 5.16.0
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    alias: mongodb

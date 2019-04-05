@@ -1,0 +1,20 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_CONNECTION_URL:mongodb://localhost/test}
+  redis:
+    url: ${REDIS_CONNECTION_URL:redis://localhost:6379}
+  cache:
+    redis:
+      cache-null-values: true
+server:
+  port: 8080
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: info, health, configprops, env
